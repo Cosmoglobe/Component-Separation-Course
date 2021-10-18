@@ -44,8 +44,10 @@ PROJECT SUMMARY FOR TOD SIMULATION EXERCISE IN AST9240
    c) Move input sims to safe place: mv chains_sim chains_sim_input
 
 4) Analyse simulations (output will end up in chains_sim):
-   a) Create an ideal CMB (temperature+polarization) realization from the Planck 2018
-      best-fit power spectrum at Nside=1024, lmax=2000 and 14 arcmin FWHM resolution
+   a) Create an ideal CMB (temperature+polarization) realization from
+      the Planck 2018 best-fit power spectrum at Nside=1024, lmax=2000 
+      and 14 arcmin FWHM resolution:
+      http://pla.esac.esa.int/pla/aio/product-action?COSMOLOGY.FILE_ID=COM_PowerSpect_CMB-base-plikHM-TTTEEE-lowl-lowE-lensing-minimum-theory_R3.01.txt
    b) Change the following parameters in param_sim.sh:
        - ENABLE_TOD_SIMULATIONS  = .false.
        - BAND_TOD_FILELIST&&&    = filelist_030_sim.txt
