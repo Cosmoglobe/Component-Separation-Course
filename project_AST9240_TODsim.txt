@@ -12,7 +12,7 @@ PROJECT SUMMARY FOR TOD SIMULATION EXERCISE IN AST9240
    d) git checkout AST9240_2021_sim
    e) mkdir build; cd build
    f) module load intel cmake
-   g) For Intel compilation (recommended): cmake -DCMAKE_INSTALL_PREFIX=your_preferred_src/Commander/build -DCMAKE_C_COMPILER=icc -DCMAKE_CXX_COMPILER=icpc -DCMAKE_Fortran_COMPILER=ifort -DMPI_C_COMPILER=mpiicc -DMPI_CXX_COMPILER=mpiicpc -DMPI_Fortran_COMPILER=mpiifort ..
+   g) For Intel compilation (recommended): cmake -DCMAKE_INSTALL_PREFIX=your_preferred_src/Commander/build -DCMAKE_C_COMPILER=icc -DCMAKE_CXX_COMPILER=icpc -DCMAKE_Fortran_COMPILER=ifort -DMPI_C_COMPILER=mpiicc -DMPI_CXX_COMPILER=mpiicpc -DMPI_Fortran_COMPILER=mpiifort -DFFTW_ENABLE_AVX2=OFF ..
    h) cmake --build . --target install -j 8
    i) Add the following lines to your .bashrc file:
 
