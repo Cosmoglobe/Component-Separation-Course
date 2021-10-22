@@ -105,7 +105,10 @@ $ cd $HOME/local/src && wget https://download.open-mpi.org/release/open-mpi/v4.0
 $ ./configure --prefix=$HOME/local/gcc/9.3.0
 $ make -j 8
 $ make install
+```
+
 3. Install CMake:
+```
 $ cd $HOME/local/src && wget https://github.com/Kitware/CMake/releases/download/v3.21.3/cmake-3.21.3.tar.gz && tar -xzvf cmake-3.21.3.tar.gz && cd cmake-3.21.3
 $ ./bootstrap --prefix=$HOME/local/gcc/9.3.0 -- -DCMAKE_BUILD_TYPE:STRING=Release 
 $ make -j 8
