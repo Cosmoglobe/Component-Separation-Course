@@ -36,24 +36,24 @@ PROJECT SUMMARY FOR TOD SIMULATION EXERCISE IN AST9240
    f) Edit 'build' and numprocs in run_sim.sh
 
 3) Produce simulations (TOD files will end up in data/LFI_030_sim):
-   a) Verify that the following parameters are set in params_sim.txt:
-       - ENABLE_TOD_SIMULATIONS  = .true.
-       - SIMS_OUTPUT_DIRECTORY   = your_preferred_workdir/data/LFI_030_sim
-       - BAND_TOD_FILELIST&&&    = filelist_030_data.txt
-   b) ./run_sim.sh
-   c) Move input sims to safe place: mv chains_sim chains_sim_input
-
-4) Analyse simulations (output will end up in chains_sim):
    a) Create an ideal CMB (temperature+polarization) realization from
       the Planck 2018 best-fit power spectrum at Nside=1024, lmax=2000 
       and 14 arcmin FWHM resolution:
       http://pla.esac.esa.int/pla/aio/product-action?COSMOLOGY.FILE_ID=COM_PowerSpect_CMB-base-plikHM-TTTEEE-lowl-lowE-lensing-minimum-theory_R3.01.txt
-   b) Change the following parameters in param_sim.sh:
+   b) Verify that the following parameters are set in params_sim.txt:
+       - COMP_INPUT_AMP_MAP&&    = your_cmb_map.fits
+       - ENABLE_TOD_SIMULATIONS  = .true.
+       - SIMS_OUTPUT_DIRECTORY   = your_preferred_workdir/data/LFI_030_sim
+       - BAND_TOD_FILELIST&&&    = filelist_030_data.txt
+   c) ./run_sim.sh
+   d) Move input sims to safe place: mv chains_sim chains_sim_input
+
+4) Analyse simulations (output will end up in chains_sim):
+   a) Change the following parameters in param_sim.sh:
        - ENABLE_TOD_SIMULATIONS  = .false.
        - BAND_TOD_FILELIST&&&    = filelist_030_sim.txt
-       - COMP_INPUT_AMP_MAP&&    = your_cmb_map.fits
-   c) mkdir chains_sim
-   d) ./run_sim.sh (let it run for at least 10 samples before proceeding;
+   b) mkdir chains_sim
+   c) ./run_sim.sh (let it run for at least 10 samples before proceeding;
       for the final results, we should have 1000. But it's useful to verify that
       the code is producing something useful before making the long run, so check
       often and early :-))
