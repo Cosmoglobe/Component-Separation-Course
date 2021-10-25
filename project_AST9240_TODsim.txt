@@ -40,6 +40,9 @@ PROJECT SUMMARY FOR TOD SIMULATION EXERCISE IN AST9240
       the Planck 2018 best-fit power spectrum at Nside=1024, lmax=2000 
       and 14 arcmin FWHM resolution:
       http://pla.esac.esa.int/pla/aio/product-action?COSMOLOGY.FILE_ID=COM_PowerSpect_CMB-base-plikHM-TTTEEE-lowl-lowE-lensing-minimum-theory_R3.01.txt
+      Add the following sky map to your simulated map, to account for
+      the CMB dipole:
+      http://tsih3.uio.no/www_cmb/hke/AST9240/map_cmb_dipole.fits
    b) Verify that the following parameters are set in params_sim.txt:
        - COMP_INPUT_AMP_MAP&&    = your_cmb_map.fits
        - ENABLE_TOD_SIMULATIONS  = .true.
