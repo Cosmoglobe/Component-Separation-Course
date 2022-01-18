@@ -1,0 +1,144 @@
+PROJECT SUMMARY FOR TOD SIMULATION EXERCISE IN AST9240
+
+0) Get access to a Linux-based machine with minimum of 128GB RAM
+
+1) Download and compile the Commander AST9240_2021_sim branch; see
+   https://cosmoglobe.github.io/Commander/#/
+
+   TL;DR
+   a) cd your_preferred_src
+   b) git clone https://github.com/Cosmoglobe/Commander.git
+   c) cd Commander
+   d) git checkout AST9240_2021_sim
+   e) mkdir build; cd build
+   f) module load intel cmake
+   g) For Intel compilation (recommended): cmake -DCMAKE_INSTALL_PREFIX=your_preferred_src/Commander/build -DCMAKE_C_COMPILER=icc -DCMAKE_CXX_COMPILER=icpc -DCMAKE_Fortran_COMPILER=ifort -DMPI_C_COMPILER=mpiicc -DMPI_CXX_COMPILER=mpiicpc -DMPI_Fortran_COMPILER=mpiifort -DFFTW_ENABLE_AVX2=OFF ..
+   h) cmake --build . --target install -j 8
+   i) Add the following lines to your .bashrc file:
+
+      ---------------------------
+      ulimit -Sd unlimited
+      ulimit -Ss unlimited
+      ulimit -c 0
+      ulimit -n 2048
+      
+      export COMMANDER_PARAMS_DEFAULT=your_preferred_src/commander3/parameter_files/defaults
+      export HEALPIX=/path/to/Healpix/root
+      --------------------------
+
+2) Download data, parameter file and runscript:
+   a) cd your_preferred_workdir
+   b) wget http://tsih3.uio.no/www_cmb/hke/AST9240/AST9240_TODsim_project.tar
+   c) tar xvf AST9240_TODsim_project.tar
+   d) cd AST9240
+   e) Change all pathnames in param_sim.txt, data/filelist_030_simulations.txt
+      and data/filelist_030_data.txt
+   f) Edit 'build' and numprocs in run_sim.sh
+
+3) Produce simulations (TOD files will end up in data/LFI_030_sim):
+   a) Create an ideal CMB (temperature+polarization) realization from
+      the Planck 2018 best-fit power spectrum at Nside=1024, lmax=2000 
+      and 14 arcmin FWHM resolution:
+      http://pla.esac.esa.int/pla/aio/product-action?COSMOLOGY.FILE_ID=COM_PowerSpect_CMB-base-plikHM-TTTEEE-lowl-lowE-lensing-minimum-theory_R3.01.txt
+      Add the following sky map to your simulated map, to account for
+      the CMB dipole:
+      http://tsih3.uio.no/www_cmb/hke/AST9240/map_cmb_dipole.fits
+   b) Verify that the following parameters are set in params_sim.txt:
+       - COMP_INPUT_AMP_MAP&&    = your_cmb_map.fits
+       - ENABLE_TOD_SIMULATIONS  = .true.
+       - SIMS_OUTPUT_DIRECTORY   = your_preferred_workdir/data/LFI_030_sim
+       - BAND_TOD_FILELIST&&&    = filelist_030_data.txt
+   c) ./run_sim.sh
+   d) Move input sims to safe place: mv chains_sim chains_sim_input
+
+4) Analyse simulations (output will end up in chains_sim):
+   a) Change the following parameters in param_sim.sh:
+       - ENABLE_TOD_SIMULATIONS  = .false.
+       - BAND_TOD_FILELIST&&&    = filelist_030_sim.txt
+   b) mkdir chains_sim
+   c) ./run_sim.sh (let it run for at least 10 samples before proceeding;
+      for the final results, we should have 1000. But it's useful to verify that
+      the code is producing something useful before making the long run, so check
+      often and early :-))
+
+5) Compute posterior mean and RMS for the following quantities, using your
+   favorite tools (healpy or whatever)
+   a) CMB map (use cmb_c0001_k*.fits)
+   b) Frequency sky map (use tod_030_map_c0001_k*.fits)
+   c) Correlated noise (use tod_030_ncorr_c0001_k*.fits)
+   d) Absolute gain for detector 27M (use chain_c0001.h5)
+   e) Gain as a function of time for detector 27M (use chain HDF file)
+   f) Chisq as a function of time for detector 27M (use chain HDF file)
+
+6) Compute (posterior mean - input)/posterior rms for each quantity, and
+   compare with an N(0,1) distribution
+
+PS! The results from 6) will form the main results in the paper we will write.
+
+
+How to install GCC+OpenMPI+CMake+Commander completely from source on Ubuntu:
+
+It takes ~2,5 hrs.
+
+1. Install GCC from source, I assume you are inside your `$HOME` directory:
+```
+$ mkdir local && cd local && mkdir src && cd src
+$ wget https://mirror.koddos.net/gcc/releases/gcc-9.3.0/gcc-9.3.0.tar.gz && tar -xzvf gcc-9.3.0.tar.gz && cd gcc-9.3.0
+$ ./contrib/download_prerequisites && mkdir build && cd build
+$ ../configure --prefix=$HOME/local/gcc/9.3.0 --enable-languages=all --disable-multilib --enable-threads --enable-checking=release --with-system-zlib
+$ make -j 8 # <= this step will take you 1-1,5 hrs
+$ make install
+```
+and lastly modify your `.bashrc`  to point to an existing installation:
+```
+export PATH=$HOME/local/gcc/9.3.0/bin:$PATH
+export MANPATH=$HOME/local/gcc/9.3.0/share/man:$MANPATH
+export INFOPATH=$HOME/local/gcc/9.3.0/share/info:$INFOPATH
+export LD_LIBRARY_PATH=$HOME/local/gcc/9.3.0/lib64:$LD_LIBRARY_PATH
+```
+and do not forget to source your `.bashrc`:
+```
+$ source .bashrc
+```
+
+2. Install an OpenMPI:
+```
+$ unset $FC
+$ cd $HOME/local/src && wget https://download.open-mpi.org/release/open-mpi/v4.0/openmpi-4.0.5.tar.gz && tar -xzvf openmpi-4.0.5.tar.gz && cd openmpi-4.0.5
+$ ./configure --prefix=$HOME/local/gcc/9.3.0
+$ make -j 8
+$ make install
+```
+
+3. Install CMake:
+```
+$ cd $HOME/local/src && wget https://github.com/Kitware/CMake/releases/download/v3.21.3/cmake-3.21.3.tar.gz && tar -xzvf cmake-3.21.3.tar.gz && cd cmake-3.21.3
+$ ./bootstrap --prefix=$HOME/local/gcc/9.3.0 -- -DCMAKE_BUILD_TYPE:STRING=Release 
+$ make -j 8
+$ make install
+```
+Now, on each of these steps, YOU CHECK INSTALLED BINARIES WITH which `<binary name>`, e.g. `which gfortran`, or `which cmake`. You do the same to check their versions: `cmake --version`!
+
+4. Finally, install Commander:
+```
+$ cd $HOME
+$ git clone https://github.com/Cosmoglobe/Commander.git && cd Commander && git checkout AST9240_2021_sim
+$ mkdir build && cd build
+$ cmake -DCMAKE_INSTALL_PREFIX=$HOME/Commander/build -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++ -DCMAKE_Fortran_COMPILER=gfortran -DMPI_C_COMPILER=mpicc -DMPI_CXX_COMPILER=mpicxx -DMPI_Fortran_COMPILER=mpif90 -DFFTW_ENABLE_AVX2=OFF -DUSE_SYSTEM_BLAS=OFF ..
+$ cmake --build . --target install -j 8
+```
+and, finally, you modify your .bashrc  again to point to your Commander installation:
+```
+export PATH=$HOME/Commander/build/bin:$HOME/local/gcc/9.3.0/bin:$PATH
+export LD_LIBRARY_PATH=$HOME/Commander/build/lib:$HOME/local/gcc/9.3.0/lib64:$LD_LIBRARY_PATH
+
+export HEALPIX=$HOME/Commander/build/healpix
+export COMMANDER_PARAMS_DEFAULT=$HOME/Commander/commander3/parameter_files/defaults
+```
+And that is it, you are done.
+To check your installation you can try to do:
+```
+commander3 --version
+```
+It should give you version information.
+If you have an MPI error, do not worry — it is expected, since some of you are on Cori or other big cluster machines which have a slurm job which cut mpi applications on login nodes.
