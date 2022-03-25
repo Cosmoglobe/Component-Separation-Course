@@ -2,14 +2,14 @@ PROJECT SUMMARY FOR TOD SIMULATION EXERCISE IN AST9240
 
 0) Get access to a Linux-based machine with minimum of 128GB RAM
 
-1) Download and compile the Commander AST9240_2021_sim branch; see
+1) Download and compile the Commander AST9240_v2 branch; see
    https://cosmoglobe.github.io/Commander/#/
 
    TL;DR
    a) cd your_preferred_src
    b) git clone https://github.com/Cosmoglobe/Commander.git
    c) cd Commander
-   d) git checkout AST9240_2021_sim
+   d) git checkout AST9240_v2
    e) mkdir build; cd build
    f) module load intel cmake
    g) For Intel compilation (recommended): cmake -DCMAKE_INSTALL_PREFIX=your_preferred_src/Commander/build -DCMAKE_C_COMPILER=icc -DCMAKE_CXX_COMPILER=icpc -DCMAKE_Fortran_COMPILER=ifort -DMPI_C_COMPILER=mpiicc -DMPI_CXX_COMPILER=mpiicpc -DMPI_Fortran_COMPILER=mpiifort -DFFTW_ENABLE_AVX2=OFF ..
@@ -83,7 +83,7 @@ It takes ~2,5 hrs.
 1. Install GCC from source, I assume you are inside your `$HOME` directory:
 ```
 $ mkdir local && cd local && mkdir src && cd src
-$ wget https://mirror.koddos.net/gcc/releases/gcc-9.3.0/gcc-9.3.0.tar.gz && tar -xzvf gcc-9.3.0.tar.gz && cd gcc-9.3.0
+$ wget https://mirror.koddos.net/gcc/releases/gcc-10.3.0/gcc-9.3.0.tar.gz && tar -xzvf gcc-9.3.0.tar.gz && cd gcc-9.3.0
 $ ./contrib/download_prerequisites && mkdir build && cd build
 $ ../configure --prefix=$HOME/local/gcc/9.3.0 --enable-languages=all --disable-multilib --enable-threads --enable-checking=release --with-system-zlib
 $ make -j 8 # <= this step will take you 1-1,5 hrs
