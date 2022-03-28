@@ -122,7 +122,7 @@ Now, on each of these steps, YOU CHECK INSTALLED BINARIES WITH which `<binary na
 4. Finally, install Commander:
 ```
 $ cd $HOME
-$ git clone https://github.com/Cosmoglobe/Commander.git && cd Commander && git checkout AST9240_2021_sim
+$ git clone https://github.com/Cosmoglobe/Commander.git && cd Commander && git checkout AST9240_v2
 $ mkdir build && cd build
 $ cmake -DCMAKE_INSTALL_PREFIX=$HOME/Commander/build -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++ -DCMAKE_Fortran_COMPILER=gfortran -DMPI_C_COMPILER=mpicc -DMPI_CXX_COMPILER=mpicxx -DMPI_Fortran_COMPILER=mpif90 -DFFTW_ENABLE_AVX2=OFF -DUSE_SYSTEM_BLAS=OFF ..
 $ cmake --build . --target install -j 8
