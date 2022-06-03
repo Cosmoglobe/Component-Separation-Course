@@ -25,6 +25,9 @@ PROJECT SUMMARY FOR TOD SIMULATION EXERCISE IN AST9240
       export COMMANDER_PARAMS_DEFAULT=your_preferred_src/commander3/parameter_files/defaults
       export HEALPIX=/path/to/Healpix/root
       --------------------------
+      For example, for Duncan, who used the `install_ita.sh` script, installed Commander in $HOME, so his .bashrc reads:
+      export HEALPIX=$HOME/Commander/downloads/healpix
+      export COMMANDER_PARAMS_DEFAULT=$HOME"/Commander/commander3/parameter_files/defaults/"
 
 2) Download data, parameter file and runscript:
    a) cd your_preferred_workdir
@@ -72,8 +75,31 @@ PROJECT SUMMARY FOR TOD SIMULATION EXERCISE IN AST9240
 
 6) Compute (posterior mean - input)/posterior rms for each quantity, and
    compare with an N(0,1) distribution
+   
+7) Deliver the end products to the owl server, either by getting an account or setting up some kind of ftp. The products you need to include are:
+   i) Chain file, with the seed you used to generate the the map appended, e.g., with seeed 1345, your file should be chain_0001_s1345.h5.
+   ii) Sky maps, tod_030_map_c0001_k*.fits.
+   iii) Correlated noise maps, tod_030_ncorr_c0001_k*.fits
+   iv) Output CMB maps, cmb_c0001_k??????.fits
+   iv) Input maps, including your_cmb_map.fits (map used to generate sims), the correlated noise map from the simulation run (tod_030_ncorr_c001_k000001.fits in chains_sim_input, the directory where the first maps were generated.)
+  
+Some general clarifying points:
+- The first run, which generates the simulated data, creates a correlated noise realization that is outputted, and writes the simulated timestreams to disk. Most of the fits maps come from a processing of the real LFI data, but the correlated noise map is exactly what is added to the simulated data.
+- The second main run, which analyzes the simulated data from the first step, will output data in the new directory. In this directory, none of the maps should have any trace of the Galactic plane in the maps. If you see any of the Galaxy in your tod_030_map_c0001_k*.fits files, there has been an error, and you should make sure that the filelist given to Commander is actually pointing to the simulated data.
+- The true instrumental parameters, including gain and noise parameters, are genearated from the first sample of chain_init_BP10.5.h5. 
+- For the Commander run that we have set up, there should be ten files that are output.
+-- chisq_c0001_k??????.fits - Nside = 16 map of the chi-squared statistic per pixel.
+-- cmb_c0001_k??????.fits - Map of CMB estimate
+-- instpar_c0001_k??????.dat - Table of sampled of map gain (unused parameter for us) and central bandpass shift, which can be sampled.
+-- res_030_c0001_k??????.fits - Difference between the sky model evaluated at the Planck LFI 30 GHz bandpass and resolution, and the processed sky map. Difference taken in map space.
+-- sigma_l_cmb_c0001_k??????.dat - Power spectrum of full-sky CMB map sample. Can be compared with the input C_l used to create the map in the first place.
+-- tod_030_map_c0001_k??????.dat - Processed 030 map, after all instrumental parameters are sampled.
+-- tod_030_ncorr_c0001_k??????.dat - Correlated noise timestream processed in the same way as the processed tod timestream, useful for identifying unmodeled systematics.
+-- tod_030_res_c0001_k??????.dat - TOD - ncorr - model binned into a sky map. Shows components of the data that are not explained either by correlated noise or the data model.
+-- tod_030_rms_c0001_k??????.fits - Standard deviation of the processed sky map, assuming a white noise contribution at every step.
+-- tod_030_Smap_c0001_k??????.fits - Spurious component map, i.e., timestream component that corresponds to differences between timestreams due to different bandpasses. Used to evaluate whether to accept a bandpass shift proposal (smaller S => more likely to accept).
 
-PS! The results from 6) will form the main results in the paper we will write.
+PS! The results from 6) and 7) will form the main results in the paper we will write.
 
 
 How to install GCC+OpenMPI+CMake+Commander completely from source on Ubuntu:
