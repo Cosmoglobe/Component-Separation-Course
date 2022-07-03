@@ -7,87 +7,105 @@ This folder contains the materials for one of the AST9240 final projects.
 0) Get access to a Linux-based machine with minimum of 128GB RAM
 
 1) Download and compile the Commander `AST9240_v2` branch (see 
-   [official documentation](git@github.com:Cosmoglobe/Component-Separation-Course.git) 
+   [official documentation](https://cosmoglobe.github.io/Commander/#/) 
    for more details):
-
-   a) cd your_preferred_src
-   b) git clone https://github.com/Cosmoglobe/Commander.git
-   c) cd Commander
-   d) git checkout AST9240_v2
-   e) mkdir build; cd build
-   f) module load intel cmake
-   g) For Intel compilation (recommended): cmake -DCMAKE_INSTALL_PREFIX=your_preferred_src/Commander/build -DCMAKE_C_COMPILER=icc -DCMAKE_CXX_COMPILER=icpc -DCMAKE_Fortran_COMPILER=ifort -DMPI_C_COMPILER=mpiicc -DMPI_CXX_COMPILER=mpiicpc -DMPI_Fortran_COMPILER=mpiifort -DFFTW_ENABLE_AVX2=OFF ..
-   h) cmake --build . --target install -j 8
-   i) Add the following lines to your .bashrc file:
+   - Choose the directory where to clone Commander source code to and switch to appropriate branch via:
    ```
-      ---------------------------
-      ulimit -Sd unlimited
-      ulimit -Ss unlimited
-      ulimit -c 0
-      ulimit -n 2048
-      
-      export COMMANDER_PARAMS_DEFAULT=your_preferred_src/commander3/parameter_files/defaults
-      export HEALPIX=/path/to/Healpix/root
-      ```
-      --------------------------
-      For example, for Duncan, who used the `install_ita.sh` script, installed Commander in $HOME, so his .bashrc reads:
-      ```
-      export HEALPIX=$HOME/Commander/downloads/healpix
-      export COMMANDER_PARAMS_DEFAULT="$HOME/Commander/commander3/parameter_files/defaults/"
+   $ cd <some_path_you_chose> && git clone https://github.com/Cosmoglobe/Commander.git && cd Commander && git checkout AST9240_v2
+   ```
+   - Create the `build` directory where all temporary files will be stored:
+   ```
+   $ mkdir build; cd build
+   ```
+   - Load necessary modules for CMake, Compilers, MPI implementation etc.. Commander is known to work with Intel and GNU compiler toolchains (Intel is tested better):
+   ```
+   $ module load <module_name_1> <module_name_2> ... <module_name_n>
+   ```
+   For example, on OWLs to install Commander with Intel OneAPI:
+   ```
+   $ module load gnu git/2.30.1 cmake/3.21.1 intel/oneapi mpi/latest icc/latest compiler-rt/latest mkl/latest
+   ```
+   - Compile Commander using CMake. For example, to compile it with Intel (recommended) do:
+   ```
+   $ cmake -DCMAKE_INSTALL_PREFIX=<some_path_you_chose>/Commander/build -DCMAKE_C_COMPILER=icc -DCMAKE_CXX_COMPILER=icpc -DCMAKE_Fortran_COMPILER=ifort -DMPI_C_COMPILER=mpiicc -DMPI_CXX_COMPILER=mpiicpc -DMPI_Fortran_COMPILER=mpiifort -DFFTW_ENABLE_AVX2=OFF ..
+   $ cmake --build . --target install -j 8
+   ```
+   here `8` stands for the number of processors to use and it depends on your system capacity
+   - Add the following lines to your `.bashrc` file:
+   ```
+   ---------------------------
+   ulimit -Sd unlimited
+   ulimit -Ss unlimited
+   ulimit -c 0
+   ulimit -n 2048
+
+   export COMMANDER_PARAMS_DEFAULT=<some_path_you_chose>/Commander/commander3/parameter_files/defaults
+   export HEALPIX=<some_path_you_chose>/Commander/build/healpix
+   ```
+   --------------------------
+   For example, for Duncan, who used the `install_ita.sh` script, installed Commander in `$HOME`, so his `.bashrc` reads:
+   ```
+   export HEALPIX=$HOME/Commander/downloads/healpix
+   export COMMANDER_PARAMS_DEFAULT="$HOME/Commander/commander3/parameter_files/defaults/"
    ```
 2) Download data, parameter file and runscript:
-   a) cd your_preferred_workdir
-   b) wget http://tsih3.uio.no/www_cmb/hke/AST9240/AST9240_TODsim_project.tar
-   c) tar xvf AST9240_TODsim_project.tar
-   d) cd AST9240
-   e) Change all pathnames in param_sim.txt, data/filelist_030_simulations.txt
-      and data/filelist_030_data.txt
-   f) Edit 'build' and numprocs in run_sim.sh
-
-3) Produce simulations (TOD files will end up in data/LFI_030_sim):
-   a) Create an ideal CMB (temperature+polarization) realization from
-      the Planck 2018 best-fit power spectrum at Nside=1024, lmax=2000 
-      and 14 arcmin FWHM resolution:
-      http://pla.esac.esa.int/pla/aio/product-action?COSMOLOGY.FILE_ID=COM_PowerSpect_CMB-base-plikHM-TTTEEE-lowl-lowE-lensing-minimum-theory_R3.01.txt
-      Add the following sky map to your simulated map, to account for
-      the CMB dipole:
-      http://tsih3.uio.no/www_cmb/hke/AST9240/map_cmb_dipole.fits
-   b) Verify that the following parameters are set in params_sim.txt:
-       - COMP_INPUT_AMP_MAP&&    = your_cmb_map.fits
-       - ENABLE_TOD_SIMULATIONS  = .true.
-       - SIMS_OUTPUT_DIRECTORY   = your_preferred_workdir/data/LFI_030_sim
-       - BAND_TOD_FILELIST&&&    = filelist_030_data.txt
-   c) ./run_sim.sh
-   d) Move input sims to safe place: mv chains_sim chains_sim_input
-
+   - Choose the directory with sufficient enough disk space to store data and download the Commander inputs:
+   ```
+   $ cd <your_preferred_workdir> && \\
+     wget http://tsih3.uio.no/www_cmb/hke/AST9240/AST9240_TODsim_project.tar && \\
+     tar xvf AST9240_TODsim_project.tar && cd AST9240
+   ```
+   - Change all pathnames in `param_sim.txt`, `data/filelist_030_simulations.txt` and `data/filelist_030_data.txt`
+   - Edit 'build' and numprocs in `run_sim.sh`
+3) Produce simulations (TOD files will end up in `data/LFI_030_sim`):
+   - Create an ideal CMB (temperature+polarization) realization from the [Planck 2018 best-fit power spectrum](http://pla.esac.esa.int/pla/aio/product-action?COSMOLOGY.FILE_ID=COM_PowerSpect_CMB-base-plikHM-TTTEEE-lowl-lowE-lensing-minimum-theory_R3.01.txt) 
+   at `Nside=1024`, `lmax=2000` and `14 arcmin FWHM` resolution. Add the [CMB dipole sky map](http://tsih3.uio.no/www_cmb/hke/AST9240/map_cmb_dipole.fits) to your simulated map, to account for the CMB dipole
+      
+   - Verify that the following parameters are set in params_sim.txt:
+   ```
+   COMP_INPUT_AMP_MAP&&    = <your_simulated_cmb_map.fits>
+   ENABLE_TOD_SIMULATIONS  = .true.
+   SIMS_OUTPUT_DIRECTORY   = <your_preferred_workdir>/data/LFI_030_sim
+   BAND_TOD_FILELIST&&&    = filelist_030_data.txt
+   ```
+   - Run Commander using `./run_sim.sh`
+   - Move input sims to safe place: 
+   ```
+   $ mv chains_sim chains_sim_input
+   ```
 4) Analyse simulations (output will end up in chains_sim):
-   a) Change the following parameters in param_sim.sh:
-       - ENABLE_TOD_SIMULATIONS  = .false.
-       - BAND_TOD_FILELIST&&&    = filelist_030_sim.txt
-   b) mkdir chains_sim
-   c) ./run_sim.sh (let it run for at least 10 samples before proceeding;
-      for the final results, we should have 1000. But it's useful to verify that
-      the code is producing something useful before making the long run, so check
-      often and early :-))
-
+   - Change the following parameters in `param_sim.sh`:
+   ```
+   ENABLE_TOD_SIMULATIONS  = .false.
+   BAND_TOD_FILELIST&&&    = filelist_030_sim.txt
+   ```
+   - Create another directory to store processed files:
+   ```
+   $ mkdir chains_sim
+   ```
+   - Verify that the code runs by running for at least 10 samples before proceeding; for the final results, we should have 1000. 
+     But it's useful to verify that the code is producing something useful before making the long run, so check often and early :-)
+   ```
+   $ ./run_sim.sh
+   ``` 
 5) Compute posterior mean and RMS for the following quantities, using your
    favorite tools (healpy or whatever)
-   a) CMB map (use cmb_c0001_k*.fits)
-   b) Frequency sky map (use tod_030_map_c0001_k*.fits)
-   c) Correlated noise (use tod_030_ncorr_c0001_k*.fits)
-   d) Absolute gain for detector 27M (use chain_c0001.h5)
-   e) Gain as a function of time for detector 27M (use chain HDF file)
-   f) Chisq as a function of time for detector 27M (use chain HDF file)
+   - CMB map (use `cmb_c0001_k*.fits`)
+   - Frequency sky map (use `tod_030_map_c0001_k*.fits`)
+   - Correlated noise (use `tod_030_ncorr_c0001_k*.fits`)
+   -  Absolute gain for detector 27M (use `chain_c0001.h5`)
+   -  Gain as a function of time for detector 27M (use chain HDF file)
+   -  Chisq as a function of time for detector 27M (use chain HDF file)
 
 6) Compute (posterior mean - input)/posterior rms for each quantity, and
-   compare with an N(0,1) distribution
+   compare with an `N(0,1)` distribution
    
 7) Deliver the end products to the owl server, either by getting an account or setting up some kind of ftp. The products you need to include are:
-   i) Chain file, with the seed you used to generate the the map appended, e.g., with seeed 1345, your file should be chain_0001_s1345.h5.
-   ii) Sky maps, tod_030_map_c0001_k*.fits.
-   iii) Correlated noise maps, tod_030_ncorr_c0001_k*.fits
-   iv) Output CMB maps, cmb_c0001_k??????.fits
-   iv) Input maps, including your_cmb_map.fits (map used to generate sims), the correlated noise map from the simulation run (tod_030_ncorr_c001_k000001.fits in chains_sim_input, the directory where the first maps were generated.)
+   - Chain file, with the seed you used to generate the the map appended, e.g., with seeed 1345, your file should be `chain_0001_s1345.h5`.
+   - Sky maps, `tod_030_map_c0001_k*.fits`
+   - Correlated noise maps, `tod_030_ncorr_c0001_k*.fits`
+   - Output CMB maps, `cmb_c0001_k??????.fits`
+   - Input maps, including your_cmb_map.fits (map used to generate sims), the correlated noise map from the simulation run (`tod_030_ncorr_c001_k000001.fits` in `chains_sim_input`, the directory where the first maps were generated.)
   
 Some general clarifying points:
 - The first run, which generates the simulated data, creates a correlated noise realization that is outputted, and writes the simulated timestreams to disk. Most of the fits maps come from a processing of the real LFI data, but the correlated noise map is exactly what is added to the simulated data.
