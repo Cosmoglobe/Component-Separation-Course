@@ -1,0 +1,11 @@
+{
+  "maksym": {
+    "datadirs":   {"input":"chains_sim_input", "output":"chains_proc"},
+    "samples":    {"start": 100, "end": 200},
+    "components": {
+      "CMB":   ["y", "maksym_cmb_map.fits", "cmb_c0001_k*.fits"],
+      "Ncorr": ["y", "tod_030_ncorr_c0001_k000001.fits", "tod_030_ncorr_c0001_k*.fits"],
+      "Sigma0":["n", "chain_init_BP10.5.h5:3", ""]
+      }
+    }
+}
